@@ -7,7 +7,7 @@ import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import {
   Shield, Eye, Users, FileText, X, Lock,
   ExternalLink, Activity, Wifi, Radar, Server, Download,
-  Clock, ShieldAlert, School, Phone
+  Clock, ShieldAlert, School, Phone, LogOut
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -18,6 +18,11 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_auth");
+    setIsAuthorized(false);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +176,13 @@ export default function Admin() {
                 disabled={registrations.length === 0}
               >
                 <Download size={16} /> EXPORT MANIFEST
+              </button>
+              <button
+                onClick={handleLogout}
+                className="stark-btn stark-font"
+                style={{ fontSize: '0.75rem', padding: '12px 25px', borderColor: '#ff3333', color: '#ff3333' }}
+              >
+                <LogOut size={16} /> TERMINATE
               </button>
               <div className="reg-counter hud-panel">
                 <Users size={16} />
