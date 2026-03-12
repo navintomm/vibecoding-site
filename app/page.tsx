@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Zap, Code, Terminal, Cpu, Globe,
   ArrowRight, Shield, Activity, Radio,
-  Fingerprint
+  Fingerprint, Mouse, ChevronDown, Clock, CheckCircle
 } from "lucide-react";
 
 export default function Home() {
@@ -77,39 +77,156 @@ export default function Home() {
           <div className="hud-line-h"></div>
           <div className="hud-line-v"></div>
         </div>
+
+        {/* HIGH-TECH SCROLL PROTOCOL */}
+        <motion.div
+          className="scroll-indicator-complex"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.5, duration: 1 }}
+        >
+          <div className="scroll-visual-engine">
+            <div className="mouse-capsule">
+              <motion.div
+                className="mouse-wheel-dot"
+                animate={{
+                  y: [0, 20, 0],
+                  opacity: [1, 0, 1]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+
+            <div className="chevron-waterfall">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    y: [0, 10, 20]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.4,
+                    ease: "linear"
+                  }}
+                >
+                  <ChevronDown size={18} className="glowing-text" />
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="energy-ring-pulse"></div>
+          </div>
+
+          <div className="scroll-label-group">
+            <div className="stark-font scroll-intel-text">INITIATE_SCROLL</div>
+            <div className="scroll-status-line">
+              <div className="status-bit-active"></div>
+              <div className="status-text-mini">DATA_FLOW_STABLE</div>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* --- MISSION INTEL --- */}
-      <section className="intel-section section-padding">
+      {/* --- SESSION OVERVIEW --- */}
+      <section className="intel-section section-padding" id="intel">
         <div className="content-width">
-          <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            className="stark-font text-center glowing-text"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="section-header text-center"
             style={{ marginBottom: '60px' }}
           >
-            MISSION PARAMETERS
-          </motion.h2>
+            <h2 className="stark-font glowing-text">SESSION <span style={{ color: 'white' }}>OVERVIEW</span></h2>
+            <div className="header-underline"></div>
+          </motion.div>
 
           <div className="intel-grid">
             {[
-              { icon: Zap, label: "DATE", value: "19 MARCH 2026" },
-              { icon: Radio, label: "TIME", value: "08:30 PM" },
-              { icon: Globe, label: "MODE", value: "ONLINE" },
-              { icon: Shield, label: "ACCESS", value: "₹50" },
+              { icon: Zap, label: "EVENT DATE", value: "19 MARCH 2026" },
+              { icon: Clock, label: "DURATION", value: "2 HOURS" },
+              { icon: Globe, label: "MODE", value: "ONLINE SESSION" },
+              { icon: Shield, label: "FEE", value: "₹50" },
+              { icon: CheckCircle, label: "CERTIFICATES", value: "PROVIDED" },
             ].map((item, idx) => (
               <motion.div
                 key={idx}
                 className="hud-panel intel-card"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
               >
+                <div className="card-glow-overlay"></div>
                 <div className="card-scanline"></div>
-                <item.icon className="glowing-text" size={32} />
-                <span className="stark-font" style={{ fontSize: '0.6rem', opacity: 0.5, marginTop: '15px' }}>{item.label}</span>
-                <h3 className="stark-font" style={{ marginTop: '5px' }}>{item.value}</h3>
+                <item.icon className="glowing-text card-icon" size={28} />
+                <span className="stark-font card-label">{item.label}</span>
+                <h3 className="stark-font card-value">{item.value}</h3>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- WORKFLOW SECTION --- */}
+      <section className="workflow-section section-padding">
+        <div className="content-width">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="section-header text-center"
+            style={{ marginBottom: '60px' }}
+          >
+            <h2 className="stark-font">WHAT YOU'LL DO <span className="glowing-text">IN THE SESSION</span></h2>
+            <div className="header-underline"></div>
+          </motion.div>
+
+          <div className="workflow-grid">
+            {[
+              {
+                step: "01",
+                title: "IDEATION",
+                desc: "Choose a lethal idea for a high-end app or website.",
+                icon: Cpu
+              },
+              {
+                step: "02",
+                title: "FEATURE OPS",
+                desc: "Plan the core features and tactical requirements.",
+                icon: Radio
+              },
+              {
+                step: "03",
+                title: "WORKFLOW DESIGN",
+                desc: "Map the basic user journey and data architecture.",
+                icon: Activity
+              },
+              {
+                step: "04",
+                title: "PROTOTYPING",
+                desc: "Build a working production-ready prototype.",
+                icon: Terminal
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                className="workflow-card glass-panel"
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+              >
+                <div className="step-badge stark-font">{item.step}</div>
+                <div className="workflow-icon-box">
+                  <item.icon size={24} className="glowing-text" />
+                </div>
+                <h3 className="stark-font">{item.title}</h3>
+                <p>{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -231,31 +348,81 @@ export default function Home() {
           letter-spacing: 4px;
           margin-bottom: 20px;
         }
+        .section-header { position: relative; }
+        .header-underline {
+          width: 80px;
+          height: 3px;
+          background: var(--primary-theme);
+          margin: 15px auto 0;
+          box-shadow: 0 0 15px var(--primary-theme);
+        }
         .intel-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 20px;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 15px;
         }
         .intel-card {
-          padding: 30px;
+          padding: 35px 20px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
           position: relative;
+          background: rgba(0, 255, 102, 0.02);
+          border-radius: 4px;
         }
-        .callout-desc {
-          margin: 20px 0 40px; 
-          opacity: 0.8; 
-          font-size: clamp(0.85rem, 4vw, 1.1rem); 
-          letter-spacing: 1px; 
-          font-weight: 500;
-          padding: 0 10px;
+        .intel-card:hover {
+          background: rgba(0, 255, 102, 0.08);
+          transform: translateY(-8px);
         }
-        .register-btn {
-          padding: 18px 40px !important;
-          min-width: 280px;
+        .card-glow-overlay {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at center, rgba(0, 255, 102, 0.15) 0%, transparent 70%);
+          opacity: 0;
+          transition: opacity 0.3s;
         }
+        .intel-card:hover .card-glow-overlay { opacity: 1; }
+        .card-icon { margin-bottom: 20px; }
+        .card-label { font-size: 8px; opacity: 0.5; letter-spacing: 2px; }
+        .card-value { font-size: 0.9rem; margin-top: 8px; }
+
+        .workflow-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+        }
+        .workflow-card {
+          padding: 30px;
+          border-radius: 8px;
+          position: relative;
+        }
+        .step-badge {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          font-size: 2rem;
+          font-weight: 900;
+          color: rgba(0, 255, 102, 0.05);
+        }
+        .workflow-icon-box {
+          width: 50px;
+          height: 50px;
+          background: rgba(0, 255, 102, 0.05);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 25px;
+          border: 1px solid rgba(0, 255, 102, 0.1);
+        }
+        .workflow-card p {
+          font-size: 0.85rem;
+          opacity: 0.7;
+          margin-top: 15px;
+          line-height: 1.6;
+        }
+
         .card-scanline {
           position: absolute;
           top: 0;
@@ -302,6 +469,98 @@ export default function Home() {
           width: 1px;
           background: linear-gradient(180deg, transparent, rgba(0, 255, 102, 0.05), transparent);
           left: 50%;
+        }
+        
+        /* High-Tech Scroll Protocol */
+        .scroll-indicator-complex {
+          position: absolute;
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+          z-index: 10;
+        }
+        .scroll-visual-engine {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+        .mouse-capsule {
+          width: 22px;
+          height: 38px;
+          border: 1px solid rgba(0, 255, 102, 0.3);
+          border-radius: 15px;
+          display: flex;
+          justify-content: center;
+          padding-top: 5px;
+          background: rgba(0, 255, 102, 0.05);
+          position: relative;
+          z-index: 2;
+        }
+        .mouse-wheel-dot {
+          width: 3px;
+          height: 3px;
+          background: var(--primary-theme);
+          border-radius: 50%;
+          box-shadow: 0 0 10px var(--primary-theme);
+        }
+        .chevron-waterfall {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-top: -5px;
+          height: 40px;
+        }
+        .energy-ring-pulse {
+          position: absolute;
+          width: 60px;
+          height: 60px;
+          border: 1px solid rgba(0, 255, 102, 0.1);
+          border-radius: 50%;
+          top: -10px;
+          animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping {
+          75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        .scroll-label-group {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 5px;
+        }
+        .scroll-intel-text {
+          font-size: 9px;
+          letter-spacing: 5px;
+          color: var(--primary-theme);
+          text-shadow: 0 0 10px var(--primary-theme);
+          opacity: 0.8;
+        }
+        .scroll-status-line {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          opacity: 0.4;
+        }
+        .status-bit-active {
+          width: 4px;
+          height: 4px;
+          background: var(--primary-theme);
+          border-radius: 1px;
+          animation: flicker 1s infinite;
+        }
+        .status-text-mini {
+          font-size: 6px;
+          letter-spacing: 1px;
+        }
+        @keyframes flicker {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
         }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -458,17 +717,18 @@ export default function Home() {
         .uplink-data .value { font-size: 11px; color: var(--primary-theme); font-weight: 600; letter-spacing: 1px; }
 
         @media (max-width: 992px) {
+          .intel-grid { grid-template-columns: repeat(2, 1fr); }
           .command-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
           .intel-grid { grid-template-columns: 1fr; }
-          .hero { padding-top: 100px; }
+          .hero { padding-top: 120px; justify-content: flex-start; }
+          .hero-content { padding-top: 40px; }
           .register-btn { min-width: 100%; }
-          .register-btn { min-width: 100%; }
-          .command-grid { grid-template-columns: 1fr; }
-          .personnel-card { padding: 20px; }
-          .personnel-name { font-size: 1.1rem; }
+          .scroll-indicator-container { bottom: 15px; }
+          .scroll-text { display: none; }
+          .hero-subtitle { letter-spacing: 4px; }
         }
       `}</style>
     </div>

@@ -451,7 +451,7 @@ export default function RootLayout({
             flex-shrink: 0;
           }
 
-          @media (max-width: 850px) {
+          @media (max-width: 992px) {
             .nav-links { display: none; }
             .mobile-menu-trigger { display: flex; }
             .nav-container { padding: 0 25px; }
