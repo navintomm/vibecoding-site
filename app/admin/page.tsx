@@ -21,7 +21,7 @@ export default function Admin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "avengers_doomsday") {
+    if (password === "admin_baseline_secure") {
       setIsAuthorized(true);
       localStorage.setItem("admin_auth", "true");
     } else {
