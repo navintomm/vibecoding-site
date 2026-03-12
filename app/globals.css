@@ -1,27 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020502;
+  --foreground: #ffffff;
+  --primary-theme: #00ff66;
+  /* Doom Green */
+  --primary-dark: #00441b;
+  /* Dark Green */
+  --primary-mid: #008f39;
+  /* Emerald */
+  --silver: #a0a0a0;
+  --tech-gray: #0a0a0a;
+  --metal: #1a1a1a;
+  --glow-theme: rgba(0, 255, 102, 0.4);
+  --energy-beam: linear-gradient(90deg, transparent, #00ff66, transparent);
+  --hud-border: 1px solid rgba(0, 255, 102, 0.3);
+  --primary-glow: 0 0 20px rgba(0, 255, 102, 0.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Backward compatibility for previous class usage */
+:root {
+  --stark-red: var(--primary-theme);
+  --dark-red: var(--primary-dark);
+  --crimson: var(--primary-mid);
+  --glow-red: var(--glow-theme);
 }
 
 * {
@@ -30,13 +32,571 @@ body {
   margin: 0;
 }
 
-a {
-  color: inherit;
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+}
+
+h1,
+h2,
+h3,
+.stark-font {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+/* --- Cinematic Background --- */
+.cinematic-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 68, 27, 0.45) 0%, transparent 80%),
+    linear-gradient(rgba(2, 5, 2, 0.85), rgba(2, 5, 2, 0.95)),
+    url('/doom.png');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.energy-field {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, #00ff66, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 50px 160px, #00ff66, rgba(0, 0, 0, 0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.15;
+  animation: drift 100s linear infinite;
+}
+
+@keyframes drift {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Glassmorphism Protocol --- */
+.glass-panel {
+  background: rgba(10, 25, 10, 0.45);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 255, 102, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.9);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(0, 255, 102, 0.4);
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 255, 102, 0.05),
+      transparent);
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.glass-panel:hover::before {
+  left: 100%;
+  transition: 0.8s;
+}
+
+/* --- Living Environment (Particles) */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  background: var(--primary-theme);
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.6;
+}
+
+/* --- Navigation Progress --- */
+.scroll-progress-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--primary-theme);
+  box-shadow: 0 0 10px var(--primary-theme);
+  width: 100%;
+  /* Changed from 0% to allow scaling */
+  z-index: 1001;
+}
+
+/* --- Stark Tech HUD Panels --- */
+.hud-panel {
+  background: rgba(5, 10, 5, 0.8);
+  border: 1px solid rgba(0, 255, 102, 0.2);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hud-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid var(--primary-theme);
+  border-right: 2px solid var(--primary-theme);
+  opacity: 0.5;
+}
+
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-bottom: 2px solid var(--primary-theme);
+  border-left: 2px solid var(--primary-theme);
+  opacity: 0.5;
+}
+
+.hud-panel:hover {
+  border-color: rgba(0, 255, 102, 0.6);
+  box-shadow: 0 0 30px rgba(0, 68, 27, 0.3);
+  transform: translateY(-5px) scale(1.02);
+}
+
+/* --- Cinematic Buttons --- */
+.stark-btn {
+  background: transparent;
+  color: white;
+  border: 1px solid var(--primary-theme);
+  padding: 12px 30px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stark-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--energy-beam);
+  transition: none;
+}
+
+.stark-btn.primary {
+  background: rgba(0, 68, 27, 0.3);
+  box-shadow: 0 0 10px var(--glow-theme);
+}
+
+.stark-btn:hover {
+  background: var(--primary-theme);
+  box-shadow: 0 0 40px var(--primary-theme);
+  color: black;
+}
+
+.stark-btn:hover::before {
+  left: 100%;
+  transition: 0.6s;
+}
+
+.pulse-btn {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 102, 0.8);
+  }
+
+  100% {
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+  }
+}
+
+/* --- Navigation --- */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 20px 0;
+  z-index: 1000;
+  background: linear-gradient(to bottom, rgba(2, 5, 2, 1), transparent);
+  transition: all 0.3s;
+}
+
+.navbar.scrolled {
+  background: rgba(2, 5, 2, 0.98);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 255, 102, 0.2);
+  padding: 12px 0;
+}
+
+/* --- Brand & Logo Protocol --- */
+.nav-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.avengers-logo-mini {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.avengers-logo-mini::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--primary-theme);
+  border-radius: 50%;
+  animation: rotate-slow 15s linear infinite;
+  opacity: 0.3;
+}
+
+.emblem-img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px var(--primary-theme));
+  transform: rotate(0deg);
+  /* Straight as requested */
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-emblem-bg {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw;
+  max-width: 600px;
+  opacity: 0.15;
+  /* Increased from 0.05 */
+  z-index: 0;
+  pointer-events: none;
+  filter: brightness(0) invert(1) sepia(1) saturate(15000%) hue-rotate(90deg) blur(1px);
+}
+
+.hero-emblem-bg img {
+  width: 100%;
+  height: auto;
+  transform: rotate(0deg);
+  /* Straight as requested */
+  animation: breathe-emblem 10s ease-in-out infinite;
+}
+
+@keyframes breathe-emblem {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.15;
+  }
+
+  50% {
+    transform: scale(1.08) rotate(0deg);
+    opacity: 0.25;
+  }
+}
+
+.navbar.scrolled .avengers-logo-mini {
+  width: 32px;
+  height: 32px;
+}
+
+/* --- Hero Section --- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 100px 20px 40px;
+  position: relative;
+}
+
+.hero-title {
+  font-size: clamp(3rem, 12vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  margin-bottom: 25px;
+  color: #fff;
+  letter-spacing: -2px;
+}
+
+.hero-coding-glow {
+  color: var(--primary-theme);
+  text-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
+  /* Sharper, less blurry */
+}
+
+.hero-subtitle {
+  font-size: clamp(0.8rem, 4vw, 1.4rem);
+  letter-spacing: 12px;
+  margin-top: 15px;
+  opacity: 0.9;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  font-weight: 500;
+}
+
+.hero-description {
+  max-width: 700px;
+  margin: 20px auto 40px;
+  line-height: 1.6;
+  font-size: clamp(0.9rem, 3.5vw, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 1px;
+}
+
+.cta-main {
+  min-width: 260px;
+  padding: 18px 45px !important;
+  font-size: 1rem !important;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .hero-subtitle {
+    letter-spacing: 6px;
+  }
+
+  .hero {
+    padding-top: 120px;
+  }
+}
+
+.glowing-text {
+  color: var(--primary-theme);
+  text-shadow: 0 0 15px var(--primary-theme), 0 0 30px var(--primary-dark);
+  -webkit-text-fill-color: var(--primary-theme);
+}
+
+/* --- Forms --- */
+.stark-input-container {
+  margin-bottom: 12px;
+  /* Extremely tight for console feel */
+  position: relative;
+}
+
+.stark-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 255, 102, 0.15);
+  padding: 10px 15px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+}
+
+.stark-input:hover {
+  border-color: rgba(0, 255, 102, 0.3);
+  background: rgba(0, 68, 27, 0.1);
+}
+
+.stark-input:focus {
+  outline: none;
+  border-color: var(--primary-theme);
+  background: rgba(0, 68, 27, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+}
+
+.stark-label {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8px;
+  /* Technical caption size */
+  margin-bottom: 6px;
+  color: var(--silver);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* --- Utilities --- */
+.content-width {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section-padding {
+  padding: 80px 0;
+}
+
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 60px 0;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+footer {
+  padding: 40px 20px;
+  background: rgba(2, 5, 2, 0.95);
+  text-align: center;
+  border-top: 1px solid rgba(0, 255, 102, 0.1);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .content-width {
+    padding: 0 15px;
+  }
+}
+
+/* Background Overrides */
+.protocol-visual {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 255, 102, 0.2);
+  border: 1px solid rgba(0, 255, 102, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.protocol-visual::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    linear-gradient(rgba(2, 5, 2, 0.5), rgba(2, 5, 2, 0.5)),
+    url('/emblem.png');
+  background-size: cover;
+  background-position: center;
+  transform: rotate(-90deg);
+  z-index: 0;
+}
+
+.protocol-visual>* {
+  position: relative;
+  z-index: 1;
+}
+
+.recruitment-callout {
+  background:
+    linear-gradient(rgba(2, 5, 2, 0.8), rgba(2, 5, 2, 0.8)),
+    url('/thor_callout.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border-color: rgba(0, 255, 102, 0.4) !important;
+  box-shadow: 0 0 50px rgba(0, 255, 102, 0.3) !important;
+  padding: 60px 20px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.8rem;
+    letter-spacing: 2px !important;
+  }
+
+  .stark-btn {
+    width: 100%;
+    letter-spacing: 2px;
+    padding: 12px 20px;
+  }
+
+  .protocol-visual {
+    min-height: 300px;
+  }
+
+  .section-padding {
+    padding: 40px 0;
   }
 }
