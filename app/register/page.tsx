@@ -8,7 +8,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   Upload, CheckCircle, Loader2, ArrowRight,
   QrCode, ShieldCheck, Terminal, User, Mail,
-  School, Hash, Phone, Copy, Check, Fingerprint
+  School, Hash, Phone, Copy, Check, Fingerprint,
+  Instagram, Info
 } from "lucide-react";
 
 export default function Register() {
@@ -129,38 +130,43 @@ export default function Register() {
             className="registration-intel"
           >
             <div className="intel-header">
-              <Terminal className="glowing-text" size={32} />
-              <h2 className="stark-font">PAYMENT <span className="glowing-text">PROTOCOLS</span></h2>
+              <ShieldCheck className="glowing-text" size={32} />
+              <h2 className="stark-font">PAYMENT <span className="glowing-text">GATEWAY ACTIVE</span></h2>
             </div>
 
-            <div className="hud-panel qr-card">
-              <div className="qr-viewport">
-                <img
-                  src="/qr.png"
-                  alt="Payment QR"
-                  style={{ width: '100%', height: 'auto', display: 'block' }}
-                />
-                <div className="qr-scan-line"></div>
+            <div className="hud-panel tactical-payment-vault">
+              <div className="vault-header-intel">
+                <span className="stark-font fee-badge">REGISTRATION FEE: <span className="glowing-text">₹50</span></span>
               </div>
-              <div className="qr-details">
-                <p className="stark-font" style={{ fontSize: '1.2rem', marginBottom: '10px' }}>FEE: <span className="glowing-text">₹50</span></p>
 
-                <div className="upi-copy-container hud-panel" onClick={copyToClipboard}>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--silver)', fontWeight: 600 }}>{upiId}</p>
-                  {copied ? <Check size={14} className="glowing-text" /> : <Copy size={16} />}
+              <div className="qr-container-outer glass-panel">
+                <div className="qr-viewport-highres">
+                  <img
+                    src="/qr.png"
+                    alt="Tactical Payment QR"
+                    style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }}
+                  />
+                  <div className="qr-scanning-grid"></div>
+                  <div className="qr-corner-bracket tl"></div>
+                  <div className="qr-corner-bracket tr"></div>
+                  <div className="qr-corner-bracket bl"></div>
+                  <div className="qr-corner-bracket br"></div>
                 </div>
-                <p style={{ fontSize: '0.7rem', color: 'var(--silver)', marginTop: '10px', opacity: 0.6, letterSpacing: '1px' }}>TAP UPI ID TO COPY</p>
               </div>
-            </div>
 
-            <div className="instruction-bits">
-              <div className="bit hud-panel">
-                <ShieldCheck size={16} />
-                <span>SECURE PAYMENT</span>
-              </div>
-              <div className="bit hud-panel">
-                <Fingerprint size={16} />
-                <span>VERIFY WITH TXN ID</span>
+              <div className="qr-tactical-details">
+                <div className="upi-id-block hud-panel" onClick={copyToClipboard}>
+                  <p className="stark-font label">UPI IDENTIFIER</p>
+                  <div className="upi-display">
+                    <code>{upiId}</code>
+                    {copied ? <Check size={12} className="glowing-text" /> : <Copy size={12} />}
+                  </div>
+                </div>
+
+                <div className="payment-instructions">
+                  <Info size={14} className="glowing-text" />
+                  <p>Scan using any UPI app and upload the payment screenshot during registration.</p>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -280,61 +286,106 @@ export default function Register() {
           gap: 15px;
           margin-bottom: 30px;
         }
-        .qr-card {
+        .tactical-payment-vault {
           padding: 30px;
-          text-align: center;
-          background: rgba(0, 255, 102, 0.05);
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(0, 255, 102, 0.1);
+          transition: all 0.4s ease;
+          position: relative;
         }
-        .qr-viewport {
+        .tactical-payment-vault:hover {
+          border-color: var(--primary-theme);
+          box-shadow: 0 0 30px rgba(0, 255, 102, 0.15);
+        }
+        .vault-header-intel {
+          margin-bottom: 25px;
+          text-align: center;
+        }
+        .fee-badge {
+          font-size: 0.9rem;
+          background: rgba(0, 255, 102, 0.05);
+          padding: 8px 20px;
+          border-radius: 100px;
+          border: 1px solid rgba(0, 255, 102, 0.2);
+        }
+        .qr-container-outer {
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.02);
+          margin-bottom: 25px;
+          border-radius: 12px;
+          display: flex;
+          justify-content: center;
+        }
+        .qr-viewport-highres {
           position: relative;
           background: white;
-          padding: 15px;
-          display: inline-block;
-          margin-bottom: 20px;
+          padding: 12px;
           border-radius: 8px;
-          overflow: hidden;
-          max-width: 250px;
-        }
-        .qr-scan-line {
-          position: absolute;
+          max-width: 220px;
           width: 100%;
-          height: 3px;
-          background: var(--stark-red);
-          top: 0;
-          left: 0;
-          animation: scan 3s linear infinite;
         }
-        .upi-copy-container {
+        .qr-scanning-grid {
+          position: absolute;
+          inset: 0;
+          background: 
+            linear-gradient(rgba(0, 255, 102, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 102, 0.1) 1px, transparent 1px);
+          background-size: 20px 20px;
+          pointer-events: none;
+          animation: qr-pulse 4s infinite;
+        }
+        @keyframes qr-pulse {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 0.5; }
+        }
+        .qr-corner-bracket {
+          position: absolute;
+          width: 15px;
+          height: 15px;
+          border-color: var(--primary-theme);
+          border-style: solid;
+        }
+        .tl { top: -5px; left: -5px; border-width: 2px 0 0 2px; }
+        .tr { top: -5px; right: -5px; border-width: 2px 2px 0 0; }
+        .bl { bottom: -5px; left: -5px; border-width: 0 0 2px 2px; }
+        .br { bottom: -5px; right: -5px; border-width: 0 2px 2px 0; }
+
+        .upi-id-block {
+          padding: 15px;
+          background: rgba(0, 0, 0, 0.3);
+          cursor: pointer;
+          margin-bottom: 20px;
+        }
+        .upi-id-block .label { font-size: 8px; color: var(--silver); margin-bottom: 5px; }
+        .upi-display { display: flex; align-items: center; justify-content: space-between; font-family: monospace; }
+        .payment-instructions {
+          display: flex;
+          gap: 12px;
+          font-size: 0.75rem;
+          color: var(--silver);
+          line-height: 1.5;
+          margin-bottom: 25px;
+          padding: 0 5px;
+        }
+        .instagram-protocol {
+          background: linear-gradient(45deg, rgba(0, 255, 102, 0.05), transparent);
+          text-align: center;
+        }
+        .insta-link {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
-          padding: 10px;
-          cursor: pointer;
-          background: rgba(0, 0, 0, 0.4);
+          padding: 12px;
+          text-decoration: none;
+          color: white;
+          font-size: 0.8rem;
           transition: all 0.3s;
-          border-radius: 4px;
-          border: 1px solid transparent;
         }
-        .upi-copy-container:hover {
-          background: rgba(0, 255, 102, 0.1);
-          border-color: var(--stark-red);
-        }
-        .instruction-bits {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-          margin-top: 30px;
-        }
-        .bit {
-          padding: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 1px;
+        .insta-link:hover {
+          color: var(--primary-theme);
+          letter-spacing: 2px;
+          text-shadow: 0 0 10px var(--primary-theme);
         }
         .enrollment-form {
           padding: 40px;
