@@ -99,7 +99,7 @@ export default function RootLayout({
           <div className="nav-container">
             <Link href="/" className="nav-brand-container">
               <div className="avengers-logo-mini">
-                <img src="/emblem.png" alt="A" className="emblem-img" />
+                <img src="/doomsday-logo.jpg" alt="A" className="emblem-img" />
               </div>
               <div className="brand-text stark-font glowing-text">
                 VIBE <span style={{ color: 'white' }}>CODING</span>
@@ -157,7 +157,7 @@ export default function RootLayout({
                 <div className="drawer-header">
                   <div className="nav-brand-container">
                     <div className="avengers-logo-mini">
-                      <img src="/emblem.png" alt="A" className="emblem-img" />
+                      <img src="/doomsday-logo.jpg" alt="A" className="emblem-img" />
                     </div>
                     <span className="stark-font glowing-text" style={{ fontSize: '1rem' }}>VIBE CODING</span>
                   </div>

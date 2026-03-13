@@ -1,19 +1,178 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
-  Zap, Code, Terminal, Cpu, Globe,
-  ArrowRight, Shield, Activity, Radio,
-  Fingerprint, Mouse, ChevronDown, Clock, CheckCircle
+  Fingerprint, Mouse, ChevronDown, Clock, CheckCircle,
+  Scan, Activity as ActivityIcon, Monitor, Box,
+  Zap, Code, Terminal, Cpu, Globe, ArrowRight, Shield, Activity, Radio
 } from "lucide-react";
 
+// --- Sub-components for Revamped Hero ---
+const TerminalText = ({ text, delay = 0 }: { text: string; delay?: number }) => {
+  const characters = text.split("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <motion.span
+      initial="hidden"
+      animate={mounted ? "visible" : "hidden"}
+      className="terminal-text-wrapper"
+    >
+      {characters.map((char, index) => {
+        // Stable values for SSR to prevent hydration mismatch
+        const xOffset = mounted ? Math.random() * 20 - 10 : 0;
+        const yOffset = mounted ? Math.random() * 20 - 10 : 0;
+
+        return (
+          <motion.span
+            key={index}
+            variants={{
+              hidden: { opacity: 0, x: xOffset, y: yOffset },
+              visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: {
+                  delay: delay + (index * 0.05),
+                  duration: 0.2,
+                  type: "spring",
+                  stiffness: 100
+                }
+              }
+            }}
+            className={char === " " ? "space" : "char"}
+          >
+            {char}
+          </motion.span>
+        );
+      })}
+    </motion.span>
+  );
+};
+
+const HeroHUD = () => {
+  return (
+    <div className="hero-hud-system">
+      <motion.div
+        className="hud-ring primary"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="hud-ring secondary"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="hud-ring dashed"
+        animate={{ rotate: 180 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="hud-scanline" />
+      <div className="hud-grid-background" />
+
+      {/* Corner Brackets */}
+      <div className="hud-bracket tl" />
+      <div className="hud-bracket tr" />
+      <div className="hud-bracket bl" />
+      <div className="hud-bracket br" />
+    </div>
+  );
+};
+
+const Particles = ({ count = 20 }: { count?: number }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="particles-container">
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="particle"
+          initial={{
+            x: Math.random() * 600 - 300,
+            y: Math.random() * 400 - 200,
+            opacity: 0,
+            scale: Math.random() * 0.5 + 0.5
+          }}
+          animate={{
+            y: [0, -100],
+            opacity: [0, 1, 0]
+          }}
+          transition={{
+            duration: Math.random() * 3 + 2,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+            ease: "linear"
+          }}
+          style={{
+            width: Math.random() * 4 + 1 + 'px',
+            height: Math.random() * 4 + 1 + 'px',
+            left: Math.random() * 100 + '%',
+            top: Math.random() * 100 + '%'
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const RadarHUD = () => (
+  <div className="radar-hud-container">
+    <motion.div
+      className="radar-ring-outer"
+      animate={{ rotate: 360, opacity: [0.1, 0.2, 0.1] }}
+      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+    />
+    <motion.div
+      className="radar-ring-inner"
+      animate={{ rotate: -360, opacity: [0.2, 0.4, 0.2] }}
+      transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+    />
+    <div className="radar-crosshair" />
+  </div>
+);
+
+const ScanLine = () => (
+  <motion.div
+    className="panel-scanline"
+    animate={{ top: ["-10%", "110%"] }}
+    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+  />
+);
+
 export default function Home() {
+  const [isMounted, setIsMounted] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    setMousePos({
+      x: (clientX / innerWidth - 0.5) * 15,
+      y: (clientY / innerHeight - 0.5) * 15,
+    });
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.2, delayChildren: 0.3 }
+      transition: { staggerChildren: 0.15, delayChildren: 0.5 }
     }
   };
 
@@ -22,114 +181,100 @@ export default function Home() {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.6, ease: "easeOut" as any }
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as any }
     }
   };
 
   return (
     <div className="home-container">
-      {/* --- HERO SECTION --- */}
-      <section className="hero section-padding">
+      {/* --- REVAMPED HERO SECTION --- */}
+      <section className="hero cinematic-hero" onMouseMove={handleMouseMove}>
+        <div className="hero-parallax-bg">
+          <motion.div
+            className="parallax-layer"
+            animate={{
+              x: mousePos.x,
+              y: mousePos.y,
+              scale: 1.05
+            }}
+            transition={{ type: "spring", stiffness: 50, damping: 20 }}
+          />
+          <div className="hero-gradient-mask" />
+        </div>
+
+        <HeroHUD />
+
         <motion.div
           className="hero-content content-width"
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          animate={isMounted ? "visible" : "hidden"}
         >
-          <motion.div variants={itemVariants} className="mission-id stark-font">
-            <span className="glowing-text">// MISSION INTEL ACTIVE</span>
+          <motion.div variants={itemVariants} className="mission-tag stark-font">
+            <span className="terminal-prefix">{">"}</span>
+            <TerminalText text="MISSION INTEL ACTIVE" delay={0.6} />
           </motion.div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="hero-title stark-font"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            VIBE <span className="hero-coding-glow">CODING</span>
-            <div className="hero-subtitle">
-              <span>WORKSHOP</span>
-              <span className="glowing-text">2026</span>
-            </div>
-          </motion.h1>
+          <div className="title-container">
+            <motion.h1
+              className="hero-title stark-font cinematic-title"
+              variants={itemVariants}
+            >
+              <span className="vibe-text">VIBE</span>
+              <span className="coding-text glowing-text">CODING</span>
+            </motion.h1>
 
-          <motion.p variants={itemVariants} className="hero-description h-fade-in">
+            <motion.div
+              className="hero-subtitle stark-font"
+              variants={itemVariants}
+            >
+              <div className="subtitle-line" />
+              <span>WORKSHOP</span>
+              <span className="glowing-text version-tag">2026</span>
+              <div className="subtitle-line" />
+            </motion.div>
+          </div>
+
+          <motion.p variants={itemVariants} className="hero-description mission-brief">
             INITIATE HIGH-VELOCITY DEVELOPMENT SYSTEMS. <br className="desktop-only" />
             BUILD A PRODUCTION-READY APPLICATION IN 120 MINUTES.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="hero-cta">
+          <motion.div variants={itemVariants} className="hero-cta-wrapper">
             <Link href="/register">
-              <button className="stark-btn primary pulse-btn stark-font cta-main">
-                REGISTER NOW <ArrowRight size={20} />
+              <button className="stark-btn primary cinematic-btn pulse-glow">
+                <div className="btn-glitch-layer" />
+                <span className="stark-font btn-text">INITIALIZE REGISTRATION</span>
+                <ArrowRight size={20} className="btn-icon" />
               </button>
             </Link>
           </motion.div>
         </motion.div>
 
-        {/* HUD Decorations & Avengers Emblem */}
-        <div className="hud-decorations">
-          <div className="hero-emblem-bg">
-            <img src="/emblem.png" alt="Avengers Emblem" />
-          </div>
-          <div className="hud-circle"></div>
-          <div className="hud-line-h"></div>
-          <div className="hud-line-v"></div>
-        </div>
-
-        {/* HIGH-TECH SCROLL PROTOCOL */}
+        {/* Cinematic Scroll indicator */}
         <motion.div
-          className="scroll-indicator-complex"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="mission-scroll-cue"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5, duration: 1 }}
         >
-          <div className="scroll-visual-engine">
-            <div className="mouse-capsule">
+          <div className="cue-content">
+            <div className="scroll-arrow-box">
               <motion.div
-                className="mouse-wheel-dot"
-                animate={{
-                  y: [0, 20, 0],
-                  opacity: [1, 0, 1]
-                }}
+                animate={{ y: [0, 8, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
+              >
+                <ChevronDown size={24} className="glowing-text" />
+              </motion.div>
             </div>
-
-            <div className="chevron-waterfall">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: [0, 1, 0],
-                    y: [0, 10, 20]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.4,
-                    ease: "linear"
-                  }}
-                >
-                  <ChevronDown size={18} className="glowing-text" />
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="energy-ring-pulse"></div>
-          </div>
-
-          <div className="scroll-label-group">
-            <div className="stark-font scroll-intel-text">INITIATE_SCROLL</div>
-            <div className="scroll-status-line">
-              <div className="status-bit-active"></div>
-              <div className="status-text-mini">DATA_FLOW_STABLE</div>
+            <div className="scroll-intel stark-font">
+              <span className="status-dot green" />
+              SCROLL FOR MISSION DATA
             </div>
           </div>
         </motion.div>
       </section>
+
 
       {/* --- SESSION OVERVIEW --- */}
       <section className="intel-section section-padding" id="intel">
@@ -255,10 +400,10 @@ export default function Home() {
                 status: "SESSION LEAD ACTIVE"
               },
               {
-                rank: "EVENT COORDINATOR",
-                name: "Navin Tom",
+                rank: "EVENT COORDINATORS",
+                name: "Navin Tom & Hanok Samuel",
                 intel: "S6 EL",
-                desc: "Workshop Organizer",
+                desc: "Workshop Organizers",
                 uplink: "+91 6282527929"
               }
             ].map((person, idx) => (
@@ -299,7 +444,14 @@ export default function Home() {
                   ) : (
                     <div className="uplink-data">
                       <span className="stark-font label">UPLINK:</span>
-                      <span className="value">{person.uplink}</span>
+                      <a
+                        href={`https://wa.me/${person.uplink?.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="value uplink-link"
+                      >
+                        {person.uplink} <span className="click-hint">· Click to contact</span>
+                      </a>
                     </div>
                   )}
                 </div>
@@ -309,26 +461,84 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- RECRUITMENT CALLOUT --- */}
       <section className="callout-section section-padding">
         <div className="content-width">
           <motion.div
-            className="hud-panel recruitment-callout"
-            initial={{ opacity: 0, y: 50 }}
+            className="mission-activation-panel"
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            style={{ textAlign: 'center' }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="stark-font" style={{ fontSize: 'clamp(1.8rem, 8vw, 3.5rem)', lineHeight: 1.1 }}>READY TO <span className="glowing-text">ASCEND?</span></h2>
-            <p className="callout-desc">CERTIFICATES WILL BE ISSUED TO ALL ENROLLED PERSONNEL.</p>
-            <Link href="/register">
-              <button className="stark-btn primary stark-font register-btn">
-                START REGISTRATION
-              </button>
-            </Link>
+            {/* Cinematic Static Background */}
+            <div className="callout-bg-wrapper">
+              <div className="thor-static-layer" />
+              <div className="hammer-light-bloom" />
+              <div className="hammer-sparks-container">
+                <Particles count={12} />
+              </div>
+              <div className="callout-vignette" />
+            </div>
+
+            {/* Left-Aligned Floating Panel */}
+            <div className="activation-viewport">
+              <div className="activation-intel-block glass-panel-ultra">
+                <div className="card-top-accent" />
+
+                <div className="activation-header">
+                  <div className="radar-ping-icon">
+                    <Zap size={18} className="glowing-text" />
+                  </div>
+                  <motion.h2
+                    className="stark-font activation-title"
+                    animate={{
+                      textShadow: [
+                        "0 0 8px rgba(0,255,102,0.3)",
+                        "0 0 18px rgba(0,255,102,0.5)",
+                        "0 0 8px rgba(0,255,102,0.3)"
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    READY TO<br />
+                    <span className="glowing-text">ASCEND?</span>
+                  </motion.h2>
+                </div>
+
+                <div className="glow-divider-line" />
+
+                <div className="activation-details-hud">
+                  <p className="activation-intel-text stark-font">
+                    CERTIFICATES ISSUED TO ALL ENROLLED PERSONNEL
+                  </p>
+                </div>
+
+                <div className="activation-actions">
+                  <Link href="/register">
+                    <motion.button
+                      className="stark-btn primary cinematic-btn mission-start-btn"
+                      whileHover={{ y: -2, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="stark-font"> REGISTER NOW</span>
+                      <ArrowRight size={18} className="btn-icon" />
+                    </motion.button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Neon Corner Brackets */}
+            <div className="neon-frame-overlay">
+              <div className="neon-corner tl" />
+              <div className="neon-corner tr" />
+              <div className="neon-corner bl" />
+              <div className="neon-corner br" />
+            </div>
           </motion.div>
         </div>
       </section>
+
 
       <style jsx>{`
         .home-container {
@@ -339,9 +549,10 @@ export default function Home() {
           margin: 30px auto;
           line-height: 1.8;
           font-size: clamp(0.9rem, 4vw, 1.1rem);
-          opacity: 0.8;
-          letter-spacing: 1px;
-          font-weight: 400;
+          opacity: 1;
+          letter-spacing: 1.5px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.9);
         }
         .mission-id {
           font-size: clamp(0.7rem, 3vw, 0.8rem);
@@ -715,6 +926,9 @@ export default function Home() {
         .uplink-data { display: flex; align-items: center; gap: 8px; }
         .uplink-data .label { font-size: 9px; opacity: 0.5; }
         .uplink-data .value { font-size: 11px; color: var(--primary-theme); font-weight: 600; letter-spacing: 1px; }
+        .uplink-link { text-decoration: none; cursor: pointer; transition: all 0.2s ease; }
+        .uplink-link:hover { text-shadow: 0 0 10px var(--primary-theme); opacity: 0.9; }
+        .click-hint { font-size: 8px; opacity: 0.5; font-weight: 400; letter-spacing: 0.5px; }
 
         @media (max-width: 992px) {
           .intel-grid { grid-template-columns: repeat(2, 1fr); }
@@ -722,7 +936,8 @@ export default function Home() {
         }
 
         @media (max-width: 480px) {
-          .intel-grid { grid-template-columns: 1fr; }
+          .intel-grid { grid-template-columns: 1fr; gap: 20px; }
+          .intel-card { padding: 40px 20px; }
           .hero { padding-top: 120px; justify-content: flex-start; }
           .hero-content { padding-top: 40px; }
           .register-btn { min-width: 100%; }
