@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useEffect, useState, useMemo } from "react";
 import { Outfit, Orbitron } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
@@ -11,17 +12,19 @@ import { usePathname } from "next/navigation";
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
 
-// Particle Component for Background
+// Simplified Particle Component for Background with Mobile Optimization
 const BackgroundParticles = () => {
   const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
-    const p = Array.from({ length: 30 }).map((_, i) => ({
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 12 : 30; // Reduce DOM nodes on mobile
+    const p = Array.from({ length: count }).map((_, i) => ({
       id: i,
       size: Math.random() * 2 + 1,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      duration: Math.random() * 20 + 20,
+      duration: Math.random() * 30 + 30, // Slower for better performance
       delay: Math.random() * 5,
     }));
     setParticles(p);
@@ -38,10 +41,11 @@ const BackgroundParticles = () => {
             height: particle.size,
             left: `${particle.x}%`,
             top: `${particle.y}%`,
+            willChange: 'transform, opacity'
           }}
           animate={{
-            y: ["0vh", "100vh", "0vh"],
-            opacity: [0.1, 0.4, 0.1],
+            y: ["0vh", "100vh"],
+            opacity: [0, 0.4, 0],
           }}
           transition={{
             duration: particle.duration,
@@ -99,7 +103,14 @@ export default function RootLayout({
           <div className="nav-container">
             <Link href="/" className="nav-brand-container">
               <div className="avengers-logo-mini">
-                <img src="/doomsday-logo.jpg" alt="A" className="emblem-img" />
+                <Image 
+                  src="/doomsday-logo.jpg" 
+                  alt="A" 
+                  className="emblem-img" 
+                  width={40} 
+                  height={40}
+                  priority
+                />
               </div>
               <div className="brand-text stark-font glowing-text">
                 VIBE <span style={{ color: 'white' }}>CODING</span>
@@ -157,7 +168,13 @@ export default function RootLayout({
                 <div className="drawer-header">
                   <div className="nav-brand-container">
                     <div className="avengers-logo-mini">
-                      <img src="/doomsday-logo.jpg" alt="A" className="emblem-img" />
+                      <Image 
+                        src="/doomsday-logo.jpg" 
+                        alt="A" 
+                        className="emblem-img" 
+                        width={30} 
+                        height={30}
+                      />
                     </div>
                     <span className="stark-font glowing-text" style={{ fontSize: '1rem' }}>VIBE CODING</span>
                   </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db, storage } from "@/lib/firebase";
@@ -13,15 +14,18 @@ import {
 } from "lucide-react";
 
 // --- Sub-components for Success View ---
-const Particles = ({ count = 20 }) => {
+const Particles = ({ count = 20 }: { count?: number }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
+  // Reduce count on mobile for performance
+  const finalCount = typeof window !== 'undefined' && window.innerWidth < 768 ? Math.min(count, 10) : count;
+
   return (
     <div className="sparks-container">
-      {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: finalCount }).map((_, i) => (
         <motion.div
           key={i}
           className="spark"
@@ -43,6 +47,7 @@ const Particles = ({ count = 20 }) => {
             delay: Math.random() * 2,
             ease: "easeOut"
           }}
+          style={{ willChange: 'transform, opacity' }}
         />
       ))}
     </div>
@@ -68,14 +73,20 @@ const SuccessScreen = ({ onHome, onReset }: { onHome: () => void, onReset: () =>
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
+        style={{ willChange: 'opacity' }}
       >
-        <img 
+        <Image 
           src="/doom-success.png" 
           alt="Dr Doom" 
-          className="doom-bg-img"
+          fill
           style={{
+            objectFit: 'cover',
+            objectPosition: 'center 15%',
             transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px)`,
+            willChange: 'transform'
           }}
+          className="doom-bg-img"
+          priority
         />
         <div className="doom-gradient-overlay" />
       </motion.div>
@@ -179,12 +190,6 @@ const SuccessScreen = ({ onHome, onReset }: { onHome: () => void, onReset: () =>
         .doom-bg-img {
           width: 110%;
           height: 110%;
-          position: absolute;
-          top: -5%;
-          left: -5%;
-          object-fit: cover;
-          object-position: center 15%; /* Anchor Doom's face higher */
-          filter: brightness(1.2) contrast(1.2) saturate(1.1); /* Pop the image details */
           transition: transform 0.1s ease-out;
         }
         .doom-gradient-overlay {
@@ -564,9 +569,11 @@ export default function Register() {
 
               <div className="qr-container-outer glass-panel">
                 <div className="qr-viewport-highres">
-                  <img
+                  <Image
                     src="/qr.png"
                     alt="Tactical Payment QR"
+                    width={220}
+                    height={220}
                     style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }}
                   />
                   <div className="qr-scanning-grid"></div>

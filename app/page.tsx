@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -11,47 +12,38 @@ import {
 
 // --- Sub-components for Revamped Hero ---
 const TerminalText = ({ text, delay = 0 }: { text: string; delay?: number }) => {
-  const characters = text.split("");
   const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  if (!mounted) return <span className="terminal-text-wrapper">{text}</span>;
 
   return (
     <motion.span
       initial="hidden"
-      animate={mounted ? "visible" : "hidden"}
+      animate="visible"
       className="terminal-text-wrapper"
+      variants={{
+        visible: {
+          transition: {
+            staggerChildren: 0.03, // Faster and smoother
+            delayChildren: delay
+          }
+        }
+      }}
     >
-      {characters.map((char, index) => {
-        // Stable values for SSR to prevent hydration mismatch
-        const xOffset = mounted ? Math.random() * 20 - 10 : 0;
-        const yOffset = mounted ? Math.random() * 20 - 10 : 0;
-
-        return (
-          <motion.span
-            key={index}
-            variants={{
-              hidden: { opacity: 0, x: xOffset, y: yOffset },
-              visible: {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                transition: {
-                  delay: delay + (index * 0.05),
-                  duration: 0.2,
-                  type: "spring",
-                  stiffness: 100
-                }
-              }
-            }}
-            className={char === " " ? "space" : "char"}
-          >
-            {char}
-          </motion.span>
-        );
-      })}
+      {text.split("").map((char, index) => (
+        <motion.span
+          key={index}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1 }
+          }}
+          className={char === " " ? "space" : "char"}
+          style={{ willChange: 'opacity' }}
+        >
+          {char}
+        </motion.span>
+      ))}
     </motion.span>
   );
 };
@@ -93,33 +85,33 @@ const Particles = ({ count = 20 }: { count?: number }) => {
 
   if (!mounted) return null;
 
+  // Use smaller count for mobile
+  const finalCount = typeof window !== 'undefined' && window.innerWidth < 768 ? Math.min(count, 8) : count;
+
   return (
     <div className="particles-container">
-      {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: finalCount }).map((_, i) => (
         <motion.div
           key={i}
           className="particle"
-          initial={{
-            x: Math.random() * 600 - 300,
-            y: Math.random() * 400 - 200,
-            opacity: 0,
-            scale: Math.random() * 0.5 + 0.5
-          }}
+          initial={{ opacity: 0 }}
           animate={{
-            y: [0, -100],
-            opacity: [0, 1, 0]
+            y: [0, -60],
+            opacity: [0, 0.8, 0],
+            scale: [1, 1.2, 1]
           }}
           transition={{
-            duration: Math.random() * 3 + 2,
+            duration: 3 + Math.random() * 2,
             repeat: Infinity,
             delay: Math.random() * 5,
             ease: "linear"
           }}
           style={{
-            width: Math.random() * 4 + 1 + 'px',
-            height: Math.random() * 4 + 1 + 'px',
+            width: '2px',
+            height: '2px',
             left: Math.random() * 100 + '%',
-            top: Math.random() * 100 + '%'
+            top: Math.random() * 100 + '%',
+            willChange: 'transform, opacity'
           }}
         />
       ))}
@@ -250,6 +242,17 @@ export default function Home() {
             </Link>
           </motion.div>
         </motion.div>
+
+        <div className="hero-emblem-bg" style={{ willChange: 'transform, opacity' }}>
+          <div className="hero-emblem-bg-inner">
+            <Image 
+              src="/emblem.png" 
+              alt="Emblem" 
+              fill
+              style={{ objectFit: 'contain' }}
+            />
+          </div>
+        </div>
 
         {/* Cinematic Scroll indicator */}
         <motion.div
@@ -472,7 +475,13 @@ export default function Home() {
           >
             {/* Cinematic Static Background */}
             <div className="callout-bg-wrapper">
-              <div className="thor-static-layer" />
+              <Image 
+                src="/thor_callout.jpg" 
+                alt="Tactical Callout" 
+                fill
+                style={{ objectFit: 'cover' }}
+                className="thor-static-layer"
+              />
               <div className="hammer-light-bloom" />
               <div className="hammer-sparks-container">
                 <Particles count={12} />
@@ -817,10 +826,11 @@ export default function Home() {
           pointer-events: none;
           filter: brightness(0) invert(1) sepia(1) saturate(10000%) hue-rotate(90deg);
         }
-        .hero-emblem-bg img {
+        .hero-emblem-bg-inner {
           width: 100%;
-          height: auto;
+          height: 100%;
           animation: breathe 8s ease-in-out infinite;
+          position: relative;
         }
         @keyframes breathe {
           0%, 100% { transform: scale(1); opacity: 0.08; }
